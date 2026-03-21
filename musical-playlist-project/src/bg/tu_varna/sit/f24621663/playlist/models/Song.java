@@ -28,8 +28,7 @@ public class Song {
     public void setTitle(String title) {
         this.title = title;
     }
-
-    //извеждаме формата на песента
+    
     @Override
     public String toString() {
         return "Song [ID=" + id + ", Title=" + title + ", Artist=" + artist + ", Genre=" + genre + "]";
