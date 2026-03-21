@@ -9,6 +9,10 @@ import models.Song;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Основен сервизен клас, който имплементира бизнес логиката на приложението.
+ * Управлява колекциите от песни, плейлисти и история на слушанията.
+ */
 public class PlaylistService implements PlaylistServiceInterface {
     private List<Song> allSongs;
     private List<Playlist> allPlaylists;

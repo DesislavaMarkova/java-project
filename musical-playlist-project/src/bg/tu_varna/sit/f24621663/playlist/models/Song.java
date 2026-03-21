@@ -1,7 +1,21 @@
 package models;
 
+/**
+ * Представя музикална песен с нейните основни характеристики.
+ */
+
 public class Song {
-    private int  id;
+    /**
+     * Създава нов обект от тип Song.
+     * @param id Уникален идентификатор на песента.
+     * @param title Заглавие на песента.
+     * @param artist Изпълнител на песента.
+     * @param duration Продължителност във формат mm:ss.
+     * @param album Име на албума.
+     * @param year Година на издаване.
+     * @param genre Жанр от тип {@link Genre}.
+     */
+    private int id;
     private String title;
     private String artist;
     private String album;
@@ -20,7 +34,9 @@ public class Song {
     }
 
     public int getId() { return id; }
+    /** @return Заглавието на песента. */
     public String getTitle() { return title; }
+    /** @return Изпълнителят на песента. */
     public String getArtist() { return artist; }
     public String getDuration() { return duration; }
     public Genre getGenre() { return genre; }
@@ -28,7 +44,7 @@ public class Song {
     public void setTitle(String title) {
         this.title = title;
     }
-    
+
     @Override
     public String toString() {
         return "Song [ID=" + id + ", Title=" + title + ", Artist=" + artist + ", Genre=" + genre + "]";
