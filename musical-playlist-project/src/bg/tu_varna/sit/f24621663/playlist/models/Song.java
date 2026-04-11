@@ -1,10 +1,12 @@
 package models;
 
+import java.io.Serializable;
+
 /**
  * Представя музикална песен с нейните основни характеристики.
  */
 
-public class Song {
+public class Song implements Serializable {
     /**
      * Създава нов обект от тип Song.
      * @param id Уникален идентификатор на песента.

@@ -1,5 +1,6 @@
 package models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * Представя музикален плейлист, който съдържа колекция от песни.
  */
 
-public class Playlist {
+public class Playlist implements Serializable {
     /**
      * Инициализира нов плейлист с име и описание.
      * @param name Уникално име на плейлиста.
@@ -42,4 +43,7 @@ public class Playlist {
     public List<Song> getSongs() {return songs;}
 
     public String getName() { return name; }
+
+    public String getDescription() { return description; }
+
 }

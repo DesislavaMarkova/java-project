@@ -1,5 +1,6 @@
 package services;
 
+import exceptions.PlaylistException;
 import models.Genre;
 
 /**
@@ -25,9 +26,10 @@ public interface PlaylistServiceInterface{
      */
     String createPlaylist(String name, String description);
     void addSongToPlaylist(String playlistName, int songId, Integer position);
-    void showPlaylist(String playlistName);
+    String showPlaylist(String playlistName);
 
-    void play(int songId, String playlistName);
-    void showHistory(String fromDate, String toDate);
-
+    String play(int songId, String playlistName);
+    String showHistory(String fromDate, String toDate);
+    String topTracks(int n);
+    String topPlaylists(int n);
 }

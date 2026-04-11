@@ -1,8 +1,9 @@
 package models;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class PlaylistHistory {
+public class PlaylistHistory implements Serializable {
     private Song song;
     private LocalDateTime playbackTime;
     private String playlistName;
