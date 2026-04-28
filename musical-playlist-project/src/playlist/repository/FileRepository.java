@@ -1,4 +1,4 @@
-package repository;
+package playlist.repository;
 
 public class FileRepository {
 }

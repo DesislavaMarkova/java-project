@@ -1,7 +1,7 @@
-package services;
+package playlist.services;
 
-import exceptions.PlaylistException;
-import models.Genre;
+import playlist.exceptions.PlaylistException;
+import playlist.models.Genre;
 
 /**
  * Интерфейс, дефиниращ задължителните операции за управление на музикален плейлист.

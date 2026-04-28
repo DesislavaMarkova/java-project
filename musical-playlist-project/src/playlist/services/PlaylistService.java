@@ -1,21 +1,19 @@
-package services;
+package playlist.services;
 
-import exceptions.PlaylistException;
-import models.Genre;
-import models.Playlist;
-import models.PlaylistHistory;
-import models.Song;
+import playlist.exceptions.PlaylistException;
+import playlist.models.Genre;
+import playlist.models.Playlist;
+import playlist.models.PlaylistHistory;
+import playlist.models.Song;
 
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.io.*;
 import java.util.Map;
-import java.util.Collections;
 
 /**
  * Основен сервизен клас, който имплементира бизнес логиката на приложението.
