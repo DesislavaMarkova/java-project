@@ -28,12 +28,10 @@ public class Playlist implements Serializable {
      * Добавя песен в края на плейлиста.
      * @param song Обект от тип {@link Song}.
      */
-    public void addSong(Song song) {
-        this.songs.add(song);
-    }
+    public void addSong(Song song) {this.songs.add(song);}
 
     public void addSongAt(int position, Song song) {
-        if(position >= 0 && position <= songs.size()) { this.songs.add(position, song); }
+        if(position >= 0 && position <= songs.size()) this.songs.add(position, song);
     }
 
     public void removeSong(int songId){}
@@ -41,9 +39,7 @@ public class Playlist implements Serializable {
 
     /** @return Списък с всички песни в плейлиста. */
     public List<Song> getSongs() {return songs;}
-
-    public String getName() { return name; }
-
-    public String getDescription() { return description; }
+    public String getName() {return name;}
+    public String getDescription() {return description;}
 
 }

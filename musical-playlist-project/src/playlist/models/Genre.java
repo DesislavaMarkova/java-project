@@ -1,6 +1,5 @@
 package playlist.models;
 
-
 import java.io.Serializable;
 
 /**
