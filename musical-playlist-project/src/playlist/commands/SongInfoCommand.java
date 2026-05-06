@@ -20,11 +20,13 @@ public class SongInfoCommand implements Command {
      */
     @Override
     public String execute(String[] args) {
-        if (args.length < 1) return "Употреба: songinfo <songId>";
+        if (args.length < 2) return "Употреба: songinfo <id>";
 
         try {
-            int id = Integer.parseInt(args[0]);
+            int id = Integer.parseInt(args[1].trim());
             return service.songInfo(id);
-        } catch (NumberFormatException e) {return "ID-то трябва да бъде число";}
+        } catch (NumberFormatException e) {
+            return "Грешка: '" + args[1] + "' не е валидно число";
+        }
     }
 }

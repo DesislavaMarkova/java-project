@@ -10,32 +10,79 @@ import java.util.*;
 public class StatisticsService {
 
     /**
-     * Изчислява най-слушаните песни въз основа на историята.
+     * Изчислява най-слушаните песни за определен период.
      *
-     * @param history Списък с цялата история на слушанията.
-     * @param n Максимален брой песни за извеждане.
-     * @return Форматиран текст със заглавията на песните и броя им слушания.
+     * @param history Списък с историята на слушанията.
+     * @param n Брой резултати за показване.
+     * @param from Начална дата (yyyy-MM-dd).
+     * @param to Крайна дата (yyyy-MM-dd).
+     * @return Форматиран низ с класацията.
      */
-    public String getTopTracks(List<PlaylistHistory> history, int n) {
+    public String getTopTracks(List<PlaylistHistory> history, int n, String from, String to) {
         if (history.isEmpty()) return "Няма данни за слушания";
 
         Map<String, Integer> counts = new HashMap<>();
+
         for (PlaylistHistory record : history) {
+            String playbackDate = record.getPlaybackTime().toLocalDate().toString();
+
+            if (from != null && playbackDate.compareTo(from) < 0) continue;
+            if (to != null && playbackDate.compareTo(to) > 0) continue;
+
             String title = record.getSong().getTitle();
             counts.put(title, counts.getOrDefault(title, 0) + 1);
         }
+        return formatRanking(counts, n, "най-слушани песни");
+    }
 
-        List<Map.Entry<String, Integer>> sortedTracks = new ArrayList<>(counts.entrySet());
-        sortedTracks.sort((a, b)
-                -> b.getValue().compareTo(a.getValue()));
+    /**
+     * Изчислява най-популярните изпълнители за определен период.
+     *
+     * @param history Списък с историята на слушанията.
+     * @param n Брой резултати за показване.
+     * @param from Начална дата (yyyy-MM-dd).
+     * @param to Крайна дата (yyyy-MM-dd).
+     * @return Форматиран низ с класацията.
+     */
+    public String getTopArtists(List<PlaylistHistory> history, int n, String from, String to) {
+        if (history.isEmpty())  return "Няма данни в историята";
 
-        StringBuilder sb = new StringBuilder("Топ най-слушани песни:\n");
-        int limit = Math.min(n, sortedTracks.size());
+        Map<String, Integer> counts = new HashMap<>();
+
+        for (PlaylistHistory record : history) {
+            String playbackDate = record.getPlaybackTime().toLocalDate().toString();
+
+            if (from != null && playbackDate.compareTo(from) < 0) continue;
+            if (to != null && playbackDate.compareTo(to) > 0) continue;
+
+            if (record.getSong() != null) {
+                String artist = record.getSong().getArtist();
+                counts.put(artist, counts.getOrDefault(artist, 0) + 1);
+            }
+        }
+        return formatRanking(counts, n, "топ изпълнители");
+    }
+
+    /**
+     * Помощен метод за сортиране и форматиране на резултатите в списък.
+     *
+     * @param counts Карта с обекти и техния брой срещания.
+     * @param n Брой елементи за извеждане.
+     * @param label Етикет за заглавието на статистиката.
+     * @return Форматиран текст.
+     */
+    private String formatRanking(Map<String, Integer> counts, int n, String label) {
+        if (counts.isEmpty())  return "Няма открити данни за посочения период";
+
+        List<Map.Entry<String, Integer>> list = new ArrayList<>(counts.entrySet());
+        list.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+
+        StringBuilder sb = new StringBuilder("Класация" + label + "\n");
+        int limit = Math.min(n, list.size());
 
         for (int i = 0; i < limit; i++) {
-            Map.Entry<String, Integer> entry = sortedTracks.get(i);
-            sb.append(" ").append(entry.getKey()).append(": ")
-                    .append(entry.getValue()).append(" слушания\n");
+            Map.Entry<String, Integer> entry = list.get(i);
+            sb.append((i + 1) + " " + entry.getKey() + ": " + entry.getValue() + " слушания\n");
         }
         return sb.toString();
     }
@@ -72,5 +119,23 @@ public class StatisticsService {
             }
         }
         return result.toString();
+    }
+
+    /**
+     * Изчислява най-активните плейлисти на база историята.
+     *
+     * @param history Списък с историята.
+     * @param n Брой резултати.
+     * @return Форматирана класация.
+     */
+    public String getTopPlaylists(List<PlaylistHistory> history, int n) {
+        if (history.isEmpty()) return "Историята е празна";
+
+        Map<String, Integer> counts = new HashMap<>();
+        for (PlaylistHistory h : history) {
+            String name = h.getPlaylistName();
+            if (name != null) counts.put(name, counts.getOrDefault(name, 0) + 1);
+        }
+        return formatRanking(counts, n, "най-слушани плейлисти");
     }
 }

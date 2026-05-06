@@ -94,7 +94,7 @@ public class MusicService {
         List<Song> songs = playlist.getSongs();
 
         if (fromPos < 1 || fromPos > songs.size() || toPos < 1 || toPos > songs.size())
-            return "Невалидни позиции" + "Плейлистът има " + songs.size() + " песни.";
+            return "Невалидни позиции" + "Плейлистът има " + songs.size() + " песни";
 
         int fromIndex = fromPos - 1;
         int toIndex = toPos - 1;
@@ -131,5 +131,19 @@ public class MusicService {
             }
         }
         return removed;
+    }
+
+    /**
+     * Преобразува стринг в обект от тип Genre.
+     * @param genreStr Текстът, въведен от потребителя.
+     * @return Съответният Genre обект или null, ако не е намерен.
+     */
+    public Genre parseGenre(String genreStr) {
+        if (genreStr == null) return null;
+        try {
+            return Genre.valueOf(genreStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

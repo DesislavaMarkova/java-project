@@ -11,14 +11,20 @@ public class RemoveSongCommand implements Command {
     public RemoveSongCommand(PlaylistService service) {this.service = service;}
 
     /**
-     * Изпълнява изтриването по подадено ID.
+     * Изпълнява командата за премахване на песен от системата.
+     * Валидира подадения аргумент и го преобразува в числово ID.
+     *
+     * @param args Аргументи от конзолата, където args[1] е идентификаторът на песента.
+     * @return Текст с резултата от изтриването или съобщение за грешка при невалиден вход.
      */
     @Override
     public String execute(String[] args) {
-        if (args.length < 1) return "Употреба: removesong <songId>";
+        if (args.length < 2) return "Употреба: removesong <id>";
         try {
-            int songId = Integer.parseInt(args[0]);
-            return service.removeSong(songId);
-        } catch (NumberFormatException e) {return "ID-то трябва да бъде число";}
+            int id = Integer.parseInt(args[1].trim());
+            return service.removeSong(id);
+        } catch (NumberFormatException e) {
+            return "Грешка: ID-то трябва да бъде число";
+        }
     }
 }

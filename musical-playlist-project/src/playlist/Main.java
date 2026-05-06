@@ -29,19 +29,31 @@ public class Main {
         commands.put("move", new MoveCommand(service));
         commands.put("shuffle", new ShuffleCommand(service));
         commands.put("removesong", new RemoveSongCommand(service));
+        commands.put("songinfo", new SongInfoCommand(service));
+        commands.put("topartists", new TopArtistsCommand(service));
+        commands.put("topplaylists", new TopPlaylistsCommand(service));
+        commands.put("createplaylist", new CreatePlaylistCommand(service));
+        commands.put("showplaylist", new ShowPlaylistCommand(service));
+
 
         System.out.println("Music Manager работи. Напишете 'help' за помощ.");
 
         while (true) {
             System.out.print("> ");
-            String input = sc.nextLine();
+            String input = sc.nextLine().trim();
+            if (input.isEmpty()) continue;
+
             if (input.equalsIgnoreCase("exit")) break;
 
-            String[] parts = input.split(" ");
+            String[] parts = input.split("\\s+");
+
             Command cmd = commands.get(parts[0].toLowerCase());
 
-            if (cmd != null) System.out.println(cmd.execute(parts));
-            else System.out.println("Неизвестна команда");
+            if (cmd != null) {
+                System.out.println(cmd.execute(parts));
+            } else {
+                System.out.println("Неизвестна команда");
+            }
         }
         sc.close();
     }

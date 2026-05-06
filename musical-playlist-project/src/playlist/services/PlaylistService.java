@@ -22,11 +22,34 @@ public class PlaylistService implements PlaylistServiceInterface {
     public void open(String fileName) {fileService.load(fileName, data);}
 
     /**
-     * Записва текущите промени в текущо отворения файл.
+     * Записва текущото състояние на данните в отворения файл.
+     *
+     * @return Съобщение за успех или информация, че няма отворен файл.
      */
     @Override
-    public void save() {
-        if (data.currentFileName != null) fileService.save(data, data.currentFileName);
+    public String save() {
+        if (data.currentFileName != null) {
+            fileService.save(data, data.currentFileName);
+            return "Промените са записани успешно в " + data.currentFileName;
+        }
+        return "Няма отворен файл за запис";
+    }
+
+    /**
+     * Прекратява работата с текущите данни и освобождава паметта.
+     *
+     * @return Съобщение за успешно затваряне или липса на отворен файл.
+     */
+    @Override
+    public String close() {
+        if (data.currentFileName != null) {
+            data.allSongs.clear();
+            data.allPlaylists.clear();
+            data.playbackHistory.clear();
+            data.currentFileName = null;
+            return "Файлът е затворен и паметта е изчистена";
+        }
+        return "Няма отворен файл за затваряне";
     }
 
     /**
@@ -36,11 +59,6 @@ public class PlaylistService implements PlaylistServiceInterface {
     @Override
     public void saveAs(String path) {fileService.save(data, path);}
 
-    /**
-     * Прекратява работата с текущите данни и освобождава паметта.
-     */
-    @Override
-    public void close() {data.clear();}
 
     /**
      * Създава и добавя нова песен към глобалния списък.
@@ -95,16 +113,6 @@ public class PlaylistService implements PlaylistServiceInterface {
 
 
     /**
-     * Генерира класация на най-често слушаните песни.
-     * @param n Брой записи в класацията.
-     * @return Форматиран текст с топ песните.
-     */
-    @Override
-    public String topTracks(int n) {
-        return statsService.getTopTracks(data.playbackHistory, n);
-    }
-
-    /**
      * Извежда списък с всички песни в даден плейлист.
      * @param name Име на плейлиста.
      * @return Списък с песни или съобщение за грешка.
@@ -139,47 +147,6 @@ public class PlaylistService implements PlaylistServiceInterface {
         return sb.toString();
     }
 
-
-    /**
-     * Изчислява активността на всеки плейлист спрямо общия брой слушания.
-     * @param from Начална дата (в този базов вариант се приема за информация).
-     * @param to Крайна дата (в този базов вариант се приема за информация).
-     * @param threshold Минимален процент активност.
-     * @return Резултат от анализа.
-     */
-    @Override
-    public String lowActivity(String from, String to, double threshold) {
-        List<PlaylistHistory> history = data.playbackHistory;
-        List<Playlist> playlists = data.allPlaylists;
-
-        if (history.isEmpty()) {
-            return "Историята е празна";
-        }
-
-        int totalPlays = history.size();
-        StringBuilder sb = new StringBuilder("Плейлисти с активност под " + threshold + "%:\n");
-        boolean found = false;
-
-        for (Playlist p : playlists) {
-            int count = 0;
-            for (PlaylistHistory h : history) {
-                if (h.getPlaylistName().equalsIgnoreCase(p.getName())) count++;
-            }
-
-            double percent = ((double) count / totalPlays) * 100;
-
-            if (percent < threshold) {
-                sb.append("- ").append(p.getName()).append(": ").append(String.format("%.2f", percent)).append("%\n");
-                found = true;
-            }
-        }
-
-        if (!found)
-            return "Няма плейлисти с активност под зададения праг";
-
-        sb.append("\nИзползвайте dropplaylist <име>, за да ги премахнете");
-        return sb.toString();
-    }
 
     /**
      * Премахва плейлист от системата по име.
@@ -286,61 +253,76 @@ public class PlaylistService implements PlaylistServiceInterface {
         return "Песен с ID " + songId + " не е намерена";
     }
 
+
+    /**
+     * Връща списък с всички песни, регистрирани в системата.
+     *
+     * @return Списък от обекти тип Song.
+     */
+    public List<Song> getAllSongs() { return data.allSongs; }
+
+    /**
+     * Връща списък с всички създадени плейлисти.
+     *
+     * @return Списък от обекти тип Playlist.
+     */
+    public List<Playlist> getAllPlaylists() { return data.allPlaylists; }
+
+    /**
+     * Предоставя пълната история на слушанията до момента.
+     *
+     * @return Списък от записи в историята.
+     */
+    public List<PlaylistHistory> getHistory() { return data.playbackHistory; }
+
+    /**
+     * Връща името на файла, който е зареден в паметта.
+     *
+     * @return Името на файла или null, ако няма отворен файл.
+     */
+    public String getCurrentFileName() { return data.currentFileName; }
+
+    /**
+     * Показва класация на най-активните плейлисти на база броя слушания в тях.
+     *
+     * @param n Брой плейлисти за показване в класацията.
+     * @return Форматиран текст с имената на плейлистите и броя им слушания.
+     */
+    @Override
+    public String topPlaylists(int n) {
+        return statsService.getTopPlaylists(data.playbackHistory, n);
+    }
+    /**
+     * Генерира класация на най-често слушаните песни за период.
+     * @param n Брой записи в класацията.
+     * @return Форматиран текст с топ песните.
+     */
+    @Override
+    public String topTracks(int n) {
+        return statsService.getTopTracks(data.playbackHistory, n, null, null);
+    }
+
     /**
      * Генерира статистика за най-популярните изпълнители за определен период.
-     * Претърсва историята и брои уникалните слушания за всеки изпълнител.
-     *
      * @param n Колко изпълнители да покаже в класацията.
-     * @param from Начална дата във формат (yyyy-MM-dd) за филтриране.
-     * @param to Крайна дата във формат (yyyy-MM-dd) за филтриране.
-     * @return Форматиран текст със списък от топ изпълнители и техния брой слушания.
+     * @param from Начална дата за филтриране.
+     * @param to Крайна дата за филтриране.
+     * @return Форматиран текст със списък от топ изпълнители.
      */
     @Override
     public String topArtists(int n, String from, String to) {
-        if (data.playbackHistory == null || data.playbackHistory.isEmpty()) {
-            return "Няма данни в историята";
-        }
-
-        Map<String, Integer> counts = new HashMap<>();
-
-        for (PlaylistHistory h : data.playbackHistory) {
-            String playbackDate = h.getPlaybackTime().toLocalDate().toString();
-
-            if (from != null && playbackDate.compareTo(from) < 0) continue;
-            if (to != null && playbackDate.compareTo(to) > 0) continue;
-
-            if (h.getSong() != null) {
-                String artist = h.getSong().getArtist();
-                counts.put(artist, counts.getOrDefault(artist, 0) + 1);
-            }
-        }
-
-        List<Map.Entry<String, Integer>> list = new ArrayList<>(counts.entrySet());
-        list.sort((a, b)
-                -> b.getValue().compareTo(a.getValue()));
-
-        if (list.isEmpty()) return "Няма открити слушания за периода";
-
-        StringBuilder sb = new StringBuilder("Топ " + n + " изпълнители\n");
-        for (int i = 0; i < Math.min(n, list.size()); i++) {
-            Map.Entry<String, Integer> entry = list.get(i);
-            sb.append((i + 1) + " " + entry.getKey() + " " + entry.getValue() + " слушания\n");
-        }
-        return sb.toString();
+        return statsService.getTopArtists(data.playbackHistory, n, from, to);
     }
 
-    /** @return Списък с всички песни в системата. */
-    public List<Song> getAllSongs() { return data.allSongs; }
-
-    /** @return Списък с всички плейлисти. */
-    public List<Playlist> getAllPlaylists() { return data.allPlaylists; }
-
-    /** @return Пълната история на слушанията. */
-    public List<PlaylistHistory> getHistory() { return data.playbackHistory; }
-
-    /** @return Името на текущо заредения файл. */
-    public String getCurrentFileName() { return data.currentFileName; }
-
-    /** @return Статистика за плейлисти (в разработка). */
-    @Override public String topPlaylists(int n) { return "Няма налични данни за плейлисти"; }
+    /**
+     * Изчислява активността на всеки плейлист спрямо общия брой слушания.
+     * @param from Начална дата.
+     * @param to Крайна дата.
+     * @param threshold Минимален процент активност.
+     * @return Резултат от анализа.
+     */
+    @Override
+    public String lowActivity(String from, String to, double threshold) {
+        return statsService.getLowActivityPlaylists(data.allPlaylists, data.playbackHistory, threshold);
+    }
 }
