@@ -1,0 +1,6 @@
+playlist
+playlist.commands
+playlist.exceptions
+playlist.models
+playlist.repository
+playlist.services
