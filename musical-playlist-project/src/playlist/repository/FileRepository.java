@@ -12,39 +12,60 @@ import java.lang.reflect.Field;
 
 /**
  * Клас за работа с файловата система.
- * Записва и чете данните на приложението в човешки четим текстов формат.
+ * Осигурява съхранение на данните чрез четене и запис в текстов формат.
  */
 public class FileRepository {
 
+    /**
+     * Записва данните във файл, като използва метод за запис на низове.
+     * Използва се символът \n за преминаване на нов ред във файла.
+     *
+     * @param path Път до файла.
+     * @param songs Списък с песни.
+     * @param playlists Списък с плейлисти.
+     * @param history Списък с история.
+     * @throws IOException При грешка при достъп до диска.
+     */
     public void saveData(String path, List<Song> songs, List<Playlist> playlists,
                          List<PlaylistHistory> history) throws IOException {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(path))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
 
-            writer.println("---Songs---");
+            writer.write("---Songs---\n");
             for (Song s : songs) {
                 String genreStr = s.getGenre() != null ? s.getGenre().name() : "NULL";
-                writer.println(s.getId() + "|" + s.getTitle() + "|" + s.getArtist() + "|" +
-                        s.getAlbum() + "|" + s.getDuration() + "|" + s.getYear() + "|" + genreStr);
+                String row = s.getId() + "|" + s.getTitle() + "|" + s.getArtist() + "|" +
+                        s.getAlbum() + "|" + s.getDuration() + "|" + s.getYear() + "|" + genreStr + "\n";
+                writer.write(row);
             }
 
-            writer.println("---Playlists---");
+            writer.write("---Playlists---\n");
             for (Playlist p : playlists) {
-                writer.println(p.getName() + "|" + p.getDescription());
+                writer.write(p.getName() + "|" + p.getDescription() + "\n");
                 StringBuilder sb = new StringBuilder();
                 for (Song s : p.getSongs()) {
                     sb.append(s.getId()).append(",");
                 }
-                writer.println(sb.length() > 0 ? sb.toString() : "empty");
+                String songList = sb.length() > 0 ? sb.toString() : "empty";
+                writer.write(songList + "\n");
             }
 
-            writer.println("---History---");
+            writer.write("---History---\n");
             for (PlaylistHistory h : history) {
                 String pName = h.getPlaylistName() != null ? h.getPlaylistName() : "NULL";
-                writer.println(h.getSong().getId() + "|" + pName + "|" + h.getPlaybackTime().toString());
+                String row = h.getSong().getId() + "|" + pName + "|" + h.getPlaybackTime().toString() + "\n";
+                writer.write(row);
             }
         }
     }
 
+    /**
+     * Зарежда данните от файл ред по ред.
+     * Превръща текстовите редове обратно в Java обекти.
+     *
+     * @param path Път до файла.
+     * @return Масив с обекти [песни, плейлисти, история].
+     * @throws Exception При невалиден формат на данните.
+     */
     public Object[] loadData(String path) throws Exception {
         List<Song> songs = new ArrayList<>();
         List<Playlist> playlists = new ArrayList<>();
@@ -111,12 +132,9 @@ public class FileRepository {
                             history.add(h);
                         }
                     }
-                } catch (Exception e) {
-                    System.out.println("Пропуснат грешен ред във файла: " + line);
-                }
+                } catch (Exception e) {}
             }
         }
-
         return new Object[]{songs, playlists, history};
     }
 }
